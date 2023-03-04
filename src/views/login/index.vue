@@ -12,6 +12,8 @@ import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { ref, reactive, toRaw, onMounted, onBeforeUnmount } from "vue";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 import { initRouter } from "@/router/utils";
+import { setToken } from "@/utils/auth";
+import { usePermissionStoreHook } from "@/store/modules/permission";
 
 import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
@@ -33,8 +35,8 @@ dataThemeChange();
 const { title } = useNav();
 
 const ruleForm = reactive({
-  username: "admin",
-  password: "admin123"
+  username: "xiaogao",
+  password: "123456"
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
@@ -43,15 +45,31 @@ const onLogin = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       useUserStoreHook()
-        .loginByUsername({ username: ruleForm.username, password: "admin123" })
+        .loginByUsername({ username: ruleForm.username, password: "123456" })
         .then(res => {
-          if (res.success) {
-            // 获取后端路由
-            initRouter().then(() => {
-              router.push("/");
-              message("登录成功", { type: "success" });
-            });
-          }
+          usePermissionStoreHook().handleWholeMenus([]);
+          setToken({
+            username: res.data.username,
+            roles: ["admin"],
+            accessToken: res.data.accessToken
+          } as any);
+          router.push("/");
+          message("登录成功", { type: "success" });
+          //     usePermissionStoreHook().handleWholeMenus([]);
+          //     setToken({
+          //       username: "admin",
+          //       roles: ["admin"],
+          //       accessToken: "eyJhbGciOiJIUzUxMiJ9.admin"
+          //     } as any);
+          //     router.push("/");
+          //     message("登录成功", { type: "success" });
+          //     if (res.success) {
+          //       // 获取后端路由
+          //       initRouter().then(() => {
+          //         router.push("/");
+          //         message("登录成功", { type: "success" });
+          //       });
+          //     }
         });
     } else {
       loading.value = false;

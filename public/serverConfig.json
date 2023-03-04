@@ -1,10 +1,10 @@
 {
   "Version": "3.9.7",
-  "Title": "PureAdmin",
+  "Title": "武汉农业数据网站后台管理系统",
   "FixedHeader": true,
   "HiddenSideBar": false,
   "MultiTagsCache": false,
-  "KeepAlive": true,
+  "KeepAlive": false,
   "Layout": "vertical",
   "Theme": "default",
   "DarkMode": false,

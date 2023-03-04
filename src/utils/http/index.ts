@@ -1,3 +1,4 @@
+import { ElMessage } from "element-plus";
 import Axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -13,6 +14,7 @@ import { stringify } from "qs";
 import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "../message";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -89,7 +91,9 @@ class PureHttp {
                       .handRefreshToken({ refreshToken: data.refreshToken })
                       .then(res => {
                         const token = res.data.accessToken;
-                        config.headers["Authorization"] = formatToken(token);
+
+                        config.headers["Authorization"] =
+                          "bearer" + formatToken(token);
                         PureHttp.requests.forEach(cb => cb(token));
                         PureHttp.requests = [];
                       })
@@ -102,6 +106,7 @@ class PureHttp {
                   config.headers["Authorization"] = formatToken(
                     data.accessToken
                   );
+                  console.log(config.headers["Authorization"]);
                   resolve(config);
                 }
               } else {
@@ -135,6 +140,12 @@ class PureHttp {
         return response.data;
       },
       (error: PureHttpError) => {
+        if (error.response.status == 409) {
+          ElMessage.error(error.response.data["message"]);
+        }
+        if (error.response.status == 422) {
+          ElMessage.error(error.response.data["errors"]["body"]);
+        }
         const $error = error;
         $error.isCancelRequest = Axios.isCancel($error);
         // 关闭进度条动画

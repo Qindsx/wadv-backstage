@@ -47,7 +47,9 @@ export function setToken(data: DataInfo<Date>) {
   function setSessionKey(username: string, roles: Array<string>) {
     useUserStoreHook().SET_USERNAME(username);
     useUserStoreHook().SET_ROLES(roles);
+    console.log(data);
     storageSession().setItem(sessionKey, {
+      accessToken,
       refreshToken,
       expires,
       username,
@@ -75,5 +77,5 @@ export function removeToken() {
 
 /** 格式化token（jwt格式） */
 export const formatToken = (token: string): string => {
-  return "Bearer " + token;
+  return "bearer " + token;
 };
