@@ -147,7 +147,7 @@ const open = (isEdit: boolean, row, newYear: string) => {
     edit.value = isEdit;
     console.log(isEdit);
     year.value = newYear;
-    title.value = `编辑${newYear}年农林牧渔业分类总产值`;
+    title.value = `添加${newYear}年农林牧渔业分类总产值`;
   }
   drawer2.value = true;
 };

@@ -1,30 +1,30 @@
 export interface AgriculturalInvestmentType {
-  effectiveIrrigationArea: number;
-  electricityRuralArea: number;
-  pumpedIrrigationArea: number;
-  floodDroughtArea: number;
-  nitrogenousFertilizer: number;
-  phosphateFertilizer: number;
-  potashFertilizer: number;
-  mulchFilm: number;
-  mulchFilmArea: number;
-  comsumptionPesticide: number;
-  agriculturalDieselOil: number;
-  compoundFertilizer: number;
+  effectiveIrrigationArea: string;
+  electricityRuralArea: string;
+  pumpedIrrigationArea: string;
+  floodDroughtArea: string;
+  nitrogenousFertilizer: string;
+  phosphateFertilizer: string;
+  potashFertilizer: string;
+  mulchFilm: string;
+  mulchFilmArea: string;
+  comsumptionPesticide: string;
+  agriculturalDieselOil: string;
+  compoundFertilizer: string;
 }
 export interface AgricultureMechanizationType {
-  combine: number;
-  combinePower: number;
-  dieselEngines: number;
-  gasolineEngines: number;
-  largeMachinery: number;
-  largePower: number;
-  largeTractors: number;
-  miniMachinery: number;
-  miniPowers: number;
-  miniTractors: number;
-  motorizedThresher: number;
-  pumps: number;
+  combine: string;
+  combinePower: string;
+  dieselEngines: string;
+  gasolineEngines: string;
+  largeMachinery: string;
+  largePower: string;
+  largeTractors: string;
+  miniMachinery: string;
+  miniPowers: string;
+  miniTractors: string;
+  motorizedThresher: string;
+  pumps: string;
 }
 
 export interface RroductionConditionsAndInputsDatum
@@ -34,28 +34,28 @@ export interface RroductionConditionsAndInputsDatum
 }
 
 export interface CategoryValueType {
-  farming: number;
-  forestry: number;
-  animalHusbandry: number;
-  industrialService: number;
-  fishery: number;
+  farming: string;
+  forestry: string;
+  animalHusbandry: string;
+  industrialService: string;
+  fishery: string;
 }
 
 export interface FarmingCategoryValueType {
-  beans: number;
-  cereal: number;
-  cotton: number;
-  fiberCrops: number;
-  flower: number;
-  herbCrops: number;
-  oilCrops: number;
-  otherCrops: number;
-  sugarCrops: number;
-  teaFruit: number;
-  tobacco: number;
-  tuberCrops: number;
-  vagetable: number;
-  wildPlants: number;
+  beans: string;
+  cereal: string;
+  cotton: string;
+  fiberCrops: string;
+  flower: string;
+  herbCrops: string;
+  oilCrops: string;
+  otherCrops: string;
+  sugarCrops: string;
+  teaFruit: string;
+  tobacco: string;
+  tuberCrops: string;
+  vagetable: string;
+  wildPlants: string;
 }
 
 export interface CategoryOutputValueDatum
@@ -65,15 +65,15 @@ export interface CategoryOutputValueDatum
 }
 
 export interface AgriculturalProductionDatum {
-  aquaticProducts: number;
-  cotton: number;
-  eggs: number;
-  fruit: number;
-  grains: number;
-  milk: number;
-  oilBearing: number;
-  slaughteredHogs: number;
-  slaughteredPoultry: number;
-  vagetables: number;
+  aquaticProducts: string;
+  cotton: string;
+  eggs: string;
+  fruit: string;
+  grains: string;
+  milk: string;
+  oilBearing: string;
+  slaughteredHogs: string;
+  slaughteredPoultry: string;
+  vagetables: string;
   year?: string;
 }

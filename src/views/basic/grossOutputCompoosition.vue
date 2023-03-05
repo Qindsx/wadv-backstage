@@ -244,7 +244,7 @@ const exportExcel = async () => {
     const workSheet = utils.aoa_to_sheet(res);
     const workBook = utils.book_new();
     utils.book_append_sheet(workBook, workSheet);
-    writeFile(workBook, "农林牧渔业分类总产值模板 .xlsx");
+    writeFile(workBook, "农林牧渔业总产值模板.xlsx");
     ElMessage.success("导出成功");
   }
 };
@@ -319,9 +319,7 @@ const handleMany = async () => {
           <el-button class="button" type="primary"> 导入 </el-button>
         </el-upload>
         <!-- <el-link type="primary" class=" text-sm">下载模板</el-link> -->
-        <el-link
-          type="primary"
-          href="/xlsxTemplate/农林牧渔业分类总产值模板.xlsx"
+        <el-link type="primary" href="/xlsxTemplate/农林牧渔业总产值模板.xlsx"
           >下载模板</el-link
         >
       </div>

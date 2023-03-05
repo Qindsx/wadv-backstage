@@ -26,8 +26,16 @@ export type ProductionOfOtherProductsRes = {
   data: ProductionOfOtherProductsType[];
 };
 
+export type CropProductionRequestType = {
+  year: string[];
+  classify?: string;
+  /** 分页参数 */
+  limit?: string | number;
+  offset?: string | number;
+};
+
 /** 农作物生产情况(播种面积、单位产量、产量) */
-export const getCropProduction = (data: getRequestType) => {
+export const getCropProduction = (data: CropProductionRequestType) => {
   return http.request<SownOutputPerHectareRes>(
     "post",
     "/api/agriculturalProduction/manger/cropProductionByYears",
@@ -72,7 +80,7 @@ export const deleteCropProduction = (data: deleteRequestType) => {
 };
 
 /** 林业生产情况 */
-export const forestryProductionByYears = (data: getRequestType) => {
+export const getforestryProduction = (data: getRequestType) => {
   return http.request<ForestryProductionRes>(
     "post",
     "/api/agriculturalProduction/manger/forestryProductionByYears",

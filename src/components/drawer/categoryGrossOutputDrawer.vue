@@ -3,19 +3,32 @@ import { reactive, ref, watch } from "vue";
 import { ElMessage, ElMessageBox, FormInstance, FormRules } from "element-plus";
 import commForm from "../form/commForm.vue";
 import {
-  updateProductionValueAndComposition,
-  addProductionValueAndComposition
-} from "@/api/basic";
+  updeteCategoryOutputValue,
+  addCategoryOutputValue
+} from "@/api/inputsAndOutputs";
 import { message } from "@/utils/message";
 import { validate } from "@babel/types";
 
 // 表单数据与验证
 const formData = ref({
-  total: "",
   farming: "",
-  fishery: "",
+  cereal: "",
+  beans: "",
+  cotton: "",
+  oilCrops: "",
+  fiberCrops: "",
+  sugarCrops: "",
+  tobacco: "",
+  herbCrops: "",
+  tuberCrops: "",
+  vagetable: "",
+  teaFruit: "",
+  flower: "",
+  otherCrops: "",
+  wildPlants: "",
   forestry: "",
-  husbandry: "",
+  animalHusbandry: "",
+  fishery: "",
   industrialService: ""
 });
 
@@ -84,15 +97,28 @@ watch(
   drawer2,
   (newQuestion, oldQuestion) => {
     if (!newQuestion) {
-      // formData.value = {
-      //   total: "",
-      //   farming: "",
-      //   fishery: "",
-      //   forestry: "",
-      //   husbandry: "",
-      //   industrialService: ""
-      // };
-      formRefD.value.resetFields();
+      formData.value = {
+        farming: "",
+        cereal: "",
+        beans: "",
+        cotton: "",
+        oilCrops: "",
+        fiberCrops: "",
+        sugarCrops: "",
+        tobacco: "",
+        herbCrops: "",
+        tuberCrops: "",
+        vagetable: "",
+        teaFruit: "",
+        flower: "",
+        otherCrops: "",
+        wildPlants: "",
+        forestry: "",
+        animalHusbandry: "",
+        fishery: "",
+        industrialService: ""
+      };
+      // formRefD.value.resetFields();
     }
   },
   {}
@@ -121,7 +147,7 @@ function confirmClick() {
 
 // 发送修改请求
 async function updeteForm() {
-  const res = await updateProductionValueAndComposition({
+  const res = await updeteCategoryOutputValue({
     data: { ...formData.value },
     year: year.value
   });
@@ -134,7 +160,7 @@ async function updeteForm() {
 
 // 发送新增请求
 async function addForm() {
-  const res = await addProductionValueAndComposition({
+  const res = await addCategoryOutputValue({
     data: [{ ...formData.value, year: year.value }]
   });
   if (res.message) {
@@ -158,7 +184,7 @@ const open = (isEdit: boolean, row, newYear: string) => {
     edit.value = isEdit;
     console.log(isEdit);
     year.value = newYear;
-    title.value = `编辑${newYear}年农林牧渔业分类总产值`;
+    title.value = `添加${newYear}年农林牧渔业分类总产值`;
   }
   drawer2.value = true;
 };
@@ -192,35 +218,141 @@ const emit = defineEmits(["done"]);
           <div class="grid grid-cols-2 gap-2 w-full">
             <el-form-item
               class="col-span-1"
-              label="农林牧渔业总计"
-              prop="total"
-              :rules="rules.doblueVaild"
-            >
-              <!-- {{ rules.intVaild }} -->
-              <el-input v-model="formData.total" placeholder="请输入" />
-            </el-form-item>
-            <el-form-item
-              class="col-span-1"
-              label="农业"
+              label="农业产值"
               prop="farming"
               :rules="rules.doblueVaild"
             >
               <el-input v-model="formData.farming" placeholder="请输入" />
             </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="谷物"
+              prop="farming"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.cereal" placeholder="请输入" />
+            </el-form-item>
           </div>
           <div class="grid grid-cols-2 gap-2 w-full">
             <el-form-item
               class="col-span-1"
-              label="渔业"
-              prop="fishery"
+              label="豆类"
+              prop="beans"
               :rules="rules.doblueVaild"
             >
-              <!-- {{ rules.intVaild }} -->
-              <el-input v-model="formData.fishery" placeholder="请输入" />
+              <el-input v-model="formData.beans" placeholder="请输入" />
             </el-form-item>
             <el-form-item
               class="col-span-1"
-              label="林业"
+              label="棉花"
+              prop="cotton"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.cotton" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="油料"
+              prop="oilCrops"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.oilCrops" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="麻类"
+              prop="fiberCrops"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.fiberCrops" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="糖料"
+              prop="farming"
+              :rules="rules.sugarCrops"
+            >
+              <el-input v-model="formData.sugarCrops" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="烟草"
+              prop="tobacco"
+              :rules="rules.tobacco"
+            >
+              <el-input v-model="formData.tobacco" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="药材"
+              prop="herbCrops"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.herbCrops" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="薯类"
+              prop="tuberCrops"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.tuberCrops" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="蔬菜和菌子"
+              prop="vagetable"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.vagetable" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="茶桑果"
+              prop="teaFruit"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.teaFruit" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="花卉园艺"
+              prop="flower"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.flower" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="其他作物"
+              prop="otherCrops"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.otherCrops" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="采集野生植物"
+              prop="wildPlants"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.wildPlants" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="林业产值"
               prop="forestry"
               :rules="rules.doblueVaild"
             >
@@ -230,16 +362,36 @@ const emit = defineEmits(["done"]);
           <div class="grid grid-cols-2 gap-2 w-full">
             <el-form-item
               class="col-span-1"
-              label="牧业"
-              prop="husbandry"
+              label="牧业产值"
+              prop="animalHusbandry"
               :rules="rules.doblueVaild"
             >
-              <!-- {{ rules.intVaild }} -->
-              <el-input v-model="formData.husbandry" placeholder="请输入" />
+              <el-input
+                v-model="formData.animalHusbandry"
+                placeholder="请输入"
+              />
             </el-form-item>
             <el-form-item
               class="col-span-1"
-              label="农林牧渔服务业"
+              label="渔业产值"
+              prop="fishery"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.fishery" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="农业产值"
+              prop="farming"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.farming" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="服务业产值"
               prop="industrialService"
               :rules="rules.doblueVaild"
             >

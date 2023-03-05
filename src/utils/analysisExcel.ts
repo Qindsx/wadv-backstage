@@ -25,7 +25,7 @@ export const analysisExcel = (file: any, columns, apartProp) => {
               if (item1.prop == "year") {
                 item[item1.label] = item[item1.label] + "";
               }
-              obj[item1.prop] = item[item1.label];
+              obj[item1.prop] = item[item1.label] + "";
             }
           });
           console.log(obj);

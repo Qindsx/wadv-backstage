@@ -3,20 +3,38 @@ import { reactive, ref, watch } from "vue";
 import { ElMessage, ElMessageBox, FormInstance, FormRules } from "element-plus";
 import commForm from "../form/commForm.vue";
 import {
-  updateProductionValueAndComposition,
-  addProductionValueAndComposition
-} from "@/api/basic";
+  updeteProductionConditionsAndInputs,
+  addProductionConditionsAndInputs
+} from "@/api/inputsAndOutputs";
 import { message } from "@/utils/message";
 import { validate } from "@babel/types";
 
 // 表单数据与验证
 const formData = ref({
-  total: "",
-  farming: "",
-  fishery: "",
-  forestry: "",
-  husbandry: "",
-  industrialService: ""
+  effectiveIrrigationArea: "",
+  floodDroughtArea: "",
+  pumpedIrrigationArea: "",
+  electricityRuralArea: "",
+  nitrogenousFertilizer: "",
+  phosphateFertilizer: "",
+  potashFertilizer: "",
+  compoundFertilizer: "",
+  mulchFilm: "",
+  mulchFilmArea: "",
+  agriculturalDieselOil: "",
+  comsumptionPesticide: "",
+  dieselEngines: "",
+  gasolineEngines: "",
+  largeTractors: "",
+  largePower: "",
+  miniTractors: "",
+  miniPowers: "",
+  largeMachinery: "",
+  miniMachinery: "",
+  pumps: "",
+  combine: "",
+  combinePower: "",
+  motorizedThresher: ""
 });
 
 const doblueVaildFn = (rule, value, callback) => {
@@ -71,6 +89,7 @@ const handleClose = (done: () => void) => {
 // 关闭抽屉
 function cancelClick() {
   handleClose(() => {
+    console.log("close");
     drawer2.value = false;
   });
 }
@@ -84,15 +103,34 @@ watch(
   drawer2,
   (newQuestion, oldQuestion) => {
     if (!newQuestion) {
-      // formData.value = {
-      //   total: "",
-      //   farming: "",
-      //   fishery: "",
-      //   forestry: "",
-      //   husbandry: "",
-      //   industrialService: ""
-      // };
-      formRefD.value.resetFields();
+      console.log("close");
+      formData.value = {
+        effectiveIrrigationArea: "",
+        floodDroughtArea: "",
+        pumpedIrrigationArea: "",
+        electricityRuralArea: "",
+        nitrogenousFertilizer: "",
+        phosphateFertilizer: "",
+        potashFertilizer: "",
+        compoundFertilizer: "",
+        mulchFilm: "",
+        mulchFilmArea: "",
+        agriculturalDieselOil: "",
+        comsumptionPesticide: "",
+        dieselEngines: "",
+        gasolineEngines: "",
+        largeTractors: "",
+        largePower: "",
+        miniTractors: "",
+        miniPowers: "",
+        largeMachinery: "",
+        miniMachinery: "",
+        pumps: "",
+        combine: "",
+        combinePower: "",
+        motorizedThresher: ""
+      };
+      // formRefD.value.resetFields();
     }
   },
   {}
@@ -121,7 +159,7 @@ function confirmClick() {
 
 // 发送修改请求
 async function updeteForm() {
-  const res = await updateProductionValueAndComposition({
+  const res = await updeteProductionConditionsAndInputs({
     data: { ...formData.value },
     year: year.value
   });
@@ -134,7 +172,7 @@ async function updeteForm() {
 
 // 发送新增请求
 async function addForm() {
-  const res = await addProductionValueAndComposition({
+  const res = await addProductionConditionsAndInputs({
     data: [{ ...formData.value, year: year.value }]
   });
   if (res.message) {
@@ -150,7 +188,7 @@ const open = (isEdit: boolean, row, newYear: string) => {
   if (isEdit) {
     edit.value = isEdit;
     year.value = row.year;
-    title.value = `编辑${row.year}年农林牧渔业分类总产值`;
+    title.value = `编辑${row.year}年农业生产投入情况`;
     for (let i in formData.value) {
       if (row.hasOwnProperty(i)) formData.value[i] = row[i];
     }
@@ -158,7 +196,7 @@ const open = (isEdit: boolean, row, newYear: string) => {
     edit.value = isEdit;
     console.log(isEdit);
     year.value = newYear;
-    title.value = `编辑${newYear}年农林牧渔业分类总产值`;
+    title.value = `添加${newYear}年农业生产投入情况`;
   }
   drawer2.value = true;
 };
@@ -192,59 +230,254 @@ const emit = defineEmits(["done"]);
           <div class="grid grid-cols-2 gap-2 w-full">
             <el-form-item
               class="col-span-1"
-              label="农林牧渔业总计"
-              prop="total"
-              :rules="rules.doblueVaild"
-            >
-              <!-- {{ rules.intVaild }} -->
-              <el-input v-model="formData.total" placeholder="请输入" />
-            </el-form-item>
-            <el-form-item
-              class="col-span-1"
-              label="农业"
-              prop="farming"
-              :rules="rules.doblueVaild"
-            >
-              <el-input v-model="formData.farming" placeholder="请输入" />
-            </el-form-item>
-          </div>
-          <div class="grid grid-cols-2 gap-2 w-full">
-            <el-form-item
-              class="col-span-1"
-              label="渔业"
-              prop="fishery"
-              :rules="rules.doblueVaild"
-            >
-              <!-- {{ rules.intVaild }} -->
-              <el-input v-model="formData.fishery" placeholder="请输入" />
-            </el-form-item>
-            <el-form-item
-              class="col-span-1"
-              label="林业"
-              prop="forestry"
-              :rules="rules.doblueVaild"
-            >
-              <el-input v-model="formData.forestry" placeholder="请输入" />
-            </el-form-item>
-          </div>
-          <div class="grid grid-cols-2 gap-2 w-full">
-            <el-form-item
-              class="col-span-1"
-              label="牧业"
-              prop="husbandry"
-              :rules="rules.doblueVaild"
-            >
-              <!-- {{ rules.intVaild }} -->
-              <el-input v-model="formData.husbandry" placeholder="请输入" />
-            </el-form-item>
-            <el-form-item
-              class="col-span-1"
-              label="农林牧渔服务业"
-              prop="industrialService"
+              label="有效灌溉面积(千公顷)"
+              prop="effectiveIrrigationArea"
               :rules="rules.doblueVaild"
             >
               <el-input
-                v-model="formData.industrialService"
+                v-model="formData.effectiveIrrigationArea"
+                placeholder="请输入"
+              />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="旱涝保收面积(千公顷)"
+              prop="floodDroughtArea"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.floodDroughtArea"
+                placeholder="请输入"
+              />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="机电排灌面积(千公顷)"
+              prop="pumpedIrrigationArea"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.pumpedIrrigationArea"
+                placeholder="请输入"
+              />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="农村用电量(万千瓦小时)"
+              prop="floodDroughtArea"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.electricityRuralArea"
+                placeholder="请输入"
+              />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="农用化肥施用量-氮肥(吨)"
+              prop="nitrogenousFertilizer"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.nitrogenousFertilizer"
+                placeholder="请输入"
+              />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="农用化肥施用量-磷肥(吨)"
+              prop="phosphateFertilizer"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.phosphateFertilizer"
+                placeholder="请输入"
+              />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="农用化肥施用量-钾肥(吨)"
+              prop="potashFertilizer"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.potashFertilizer"
+                placeholder="请输入"
+              />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="农用化肥施用量-复合肥(吨)"
+              prop="compoundFertilizer"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.compoundFertilizer"
+                placeholder="请输入"
+              />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="农用塑料薄膜使用量-地膜(吨)"
+              prop="mulchFilm"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.mulchFilm" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="农用塑料薄膜使用量-地膜覆盖面积(千公顷)"
+              prop="mulchFilmArea"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.mulchFilmArea" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="农用柴油(吨)"
+              prop="agriculturalDieselOil"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.agriculturalDieselOil"
+                placeholder="请输入"
+              />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="农药使用量(吨)"
+              prop="comsumptionPesticide"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.comsumptionPesticide"
+                placeholder="请输入"
+              />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="柴油发动机动力(万千瓦)"
+              prop="dieselEngines"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.dieselEngines" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="汽油发动机动力(万千瓦)"
+              prop="gasolineEngines"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.gasolineEngines"
+                placeholder="请输入"
+              />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="大中型拖拉机(台)"
+              prop="largeTractors"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.largeTractors" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="大中型拖拉机-动力(万千瓦)"
+              prop="largePower"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.largePower" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="小型及扶手拖拉机(台)"
+              prop="miniTractors"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.miniTractors" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="小型及扶手拖拉机-动力(万千瓦)"
+              prop="miniPowers"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.miniPowers" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="大中型拖拉机配套农具(部)"
+              prop="largeMachinery"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.largeMachinery"
+                placeholder="请输入"
+              />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="小型拖拉机配套农具(部)"
+              prop="miniMachinery"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.miniMachinery" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="农用水泵(台)"
+              prop="pumps"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.pumps" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="联合收割机(台)"
+              prop="combine"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.combine" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="联合收割机-动力(千瓦)"
+              prop="combinePower"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.combinePower" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="机动脱粒机(台)"
+              prop="motorizedThresher"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.motorizedThresher"
                 placeholder="请输入"
               />
             </el-form-item>

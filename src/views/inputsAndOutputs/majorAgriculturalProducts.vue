@@ -3,14 +3,14 @@
 import { onMounted, reactive, ref, shallowRef, watch } from "vue";
 import type { PaginationProps, LoadingConfig, Align } from "@pureadmin/table";
 import {
-  getProductionValueAndComposition,
-  deleteProductionValueAndComposition,
-  addProductionValueAndComposition
-} from "@/api/basic";
+  getAgriculturalProduction,
+  deleteAgriculturalProduction,
+  addAgriculturalProduction
+} from "@/api/inputsAndOutputs";
 import { isNumber } from "@vueuse/core";
 // import formDrawer from "@/components/form/index.vue";
 // import commForm from "@/components/form/commForm.vue"
-import { grossOutputCompoositionDrawer } from "@/components/drawer";
+import { majorAgriculturalProductsDrawer } from "@/components/drawer";
 import { utils, writeFile } from "xlsx";
 import { ElMessage, ElMessageBox, UploadProps } from "element-plus";
 import { analysisExcel } from "@/utils/analysisExcel";
@@ -36,28 +36,49 @@ const columns = [
     fixed: true
   },
   {
-    label: "农林牧渔业总计",
-    prop: "total"
+    label: "粮食(吨)",
+    prop: "grains"
   },
   {
-    label: "农业",
-    prop: "farming"
+    label: "棉花(吨)",
+    prop: "cotton"
   },
   {
-    label: "渔业",
-    prop: "fishery"
+    label: "油料(吨)",
+    prop: "oilBearing"
   },
   {
-    label: "林业",
-    prop: "forestry"
+    label: "蔬菜(吨)",
+    prop: "vagetables"
   },
   {
-    label: "牧业",
-    prop: "husbandry"
+    label: "水果(吨)",
+    prop: "fruit"
   },
   {
-    label: "农林牧渔服务业",
-    prop: "industrialService"
+    label: "生猪出栏(万头)",
+    prop: "slaughteredHogs",
+    width: "120"
+  },
+
+  {
+    label: "家禽出笼(万只)",
+    prop: "slaughteredPoultry",
+    width: "120"
+  },
+  {
+    label: "禽蛋产量(吨)",
+    prop: "eggs",
+    width: "120"
+  },
+  {
+    label: "牛奶(吨)",
+    prop: "milk"
+  },
+  {
+    label: "水产品(吨)",
+    prop: "aquaticProducts",
+    width: "120"
   },
 
   {
@@ -114,7 +135,7 @@ const tableRef = ref();
 // 请求数据方法
 async function getData(size = 10, page = 1) {
   loading.value = true;
-  const res = await getProductionValueAndComposition({
+  const res = await getAgriculturalProduction({
     year: year.value,
     limit: size,
     offset: size * (page - 1)
@@ -183,7 +204,7 @@ function handeldeletes() {
 
 // 删除请求
 async function deleteData(years: string[]) {
-  const res = await deleteProductionValueAndComposition({ year: years });
+  const res = await deleteAgriculturalProduction({ year: years });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -223,7 +244,7 @@ const newOpenDrawer = () => {
 
 // 导出
 const exportExcel = async () => {
-  const resData = await getProductionValueAndComposition({ year: [] });
+  const resData = await getAgriculturalProduction({ year: [] });
   if (resData.data) {
     const res = resData.data.map(item => {
       const arr = [];
@@ -244,7 +265,7 @@ const exportExcel = async () => {
     const workSheet = utils.aoa_to_sheet(res);
     const workBook = utils.book_new();
     utils.book_append_sheet(workBook, workSheet);
-    writeFile(workBook, "农林牧渔业分类总产值模板 .xlsx");
+    writeFile(workBook, "主要农产品产量模板模板 .xlsx");
     ElMessage.success("导出成功");
   }
 };
@@ -266,7 +287,7 @@ const handleMany = async () => {
     return item;
   });
   // console.log(list);
-  const res = await addProductionValueAndComposition({ data: list });
+  const res = await addAgriculturalProduction({ data: list });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -276,10 +297,10 @@ const handleMany = async () => {
 
 <template>
   <div>
-    <grossOutputCompoositionDrawer
+    <majorAgriculturalProductsDrawer
       ref="formRef"
       @done="getData"
-    ></grossOutputCompoositionDrawer>
+    ></majorAgriculturalProductsDrawer>
     <!-- <formDrawer ref="formRef"></formDrawer> -->
     <!-- <commForm :formOptions="columns" ref="formRef"></commForm> -->
     <!-- <commForm :formOptions="columns" :formData="formData" ref="formRef"></commForm> -->
@@ -319,9 +340,7 @@ const handleMany = async () => {
           <el-button class="button" type="primary"> 导入 </el-button>
         </el-upload>
         <!-- <el-link type="primary" class=" text-sm">下载模板</el-link> -->
-        <el-link
-          type="primary"
-          href="/xlsxTemplate/农林牧渔业分类总产值模板.xlsx"
+        <el-link type="primary" href="/xlsxTemplate/主要农产品产量模板.xlsx"
           >下载模板</el-link
         >
       </div>

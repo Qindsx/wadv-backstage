@@ -3,14 +3,12 @@
 import { onMounted, reactive, ref, shallowRef, watch } from "vue";
 import type { PaginationProps, LoadingConfig, Align } from "@pureadmin/table";
 import {
-  getProductionValueAndComposition,
-  deleteProductionValueAndComposition,
-  addProductionValueAndComposition
-} from "@/api/basic";
+  getOtherProductionSituation,
+  deleteOtherProductionSituation,
+  addOtherProductionSituation
+} from "@/api/agriculturalProduction";
 import { isNumber } from "@vueuse/core";
-// import formDrawer from "@/components/form/index.vue";
-// import commForm from "@/components/form/commForm.vue"
-import { grossOutputCompoositionDrawer } from "@/components/drawer";
+import { productionOfOtherProductsDrawer } from "@/components/drawer";
 import { utils, writeFile } from "xlsx";
 import { ElMessage, ElMessageBox, UploadProps } from "element-plus";
 import { analysisExcel } from "@/utils/analysisExcel";
@@ -36,28 +34,274 @@ const columns = [
     fixed: true
   },
   {
-    label: "农林牧渔业总计",
-    prop: "total"
+    label: "年末大牲畜存栏(头)",
+    prop: "yearendStockAnimals",
+    width: "120"
   },
   {
-    label: "农业",
-    prop: "farming"
+    label: "良种及改良种乳牛(头)",
+    prop: "cowsBreed",
+    width: "120"
   },
   {
-    label: "渔业",
-    prop: "fishery"
+    label: "肉用牛(头)",
+    prop: "beefCattle",
+    width: "120"
   },
   {
-    label: "林业",
-    prop: "forestry"
+    label: "马(头)",
+    prop: "horses",
+    width: "80"
   },
   {
-    label: "牧业",
-    prop: "husbandry"
+    label: "驴(头)",
+    prop: "donkeys",
+    width: "80"
   },
   {
-    label: "农林牧渔服务业",
-    prop: "industrialService"
+    label: "骡(头)",
+    prop: "mutes",
+    width: "120"
+  },
+  {
+    label: "年末羊只数(头)",
+    prop: "yearendSheep",
+    width: "120"
+  },
+  {
+    label: "年末牲猪存栏(万头)",
+    prop: "yearendHogs",
+    width: "120"
+  },
+  {
+    label: "能繁母猪(万头)",
+    prop: "femalHogs",
+    width: "120"
+  },
+  {
+    label: "全年肉猪出栏(万头/吨)",
+    prop: "slaughteredFattenedHogs",
+    width: "160"
+  },
+  {
+    label: "全年出售和自宰肉用牛(头/吨)",
+    prop: "slaughteredCattle",
+    width: "160"
+  },
+  {
+    label: "自宰肉羊(只/吨)",
+    prop: "slaughteredSheep",
+    width: "120"
+  },
+  {
+    label: "自宰家禽(万只/吨)",
+    prop: "slaughteredPoultry",
+    width: "120"
+  },
+  {
+    label: "牛奶产量(吨)",
+    prop: "milk",
+    width: "120"
+  },
+  {
+    label: "蜂蜜(吨)",
+    prop: "honey",
+    width: "120"
+  },
+  {
+    label: "禽蛋产量(吨)",
+    prop: "eggs",
+    width: "120"
+  },
+  {
+    label: "茶叶总产量(吨)",
+    prop: "teaOutputAll",
+    width: "120"
+  },
+  {
+    label: "绿茶(吨)",
+    prop: "greenTea",
+    width: "120"
+  },
+  {
+    label: "清茶(吨)",
+    prop: "wulongTea",
+    width: "120"
+  },
+  {
+    label: "白茶(吨)",
+    prop: "whiteTea",
+    width: "120"
+  },
+  {
+    label: "其他茶(吨)",
+    prop: "otherTea",
+    width: "120"
+  },
+  {
+    label: "年末茶园面积(公顷)",
+    prop: "teaPlantationArea",
+    width: "120"
+  },
+  {
+    label: "采摘面积(公顷)",
+    prop: "pickedArea",
+    width: "120"
+  },
+  {
+    label: "水果产量(吨)",
+    prop: "fruitOutputAll",
+    width: "120"
+  },
+  {
+    label: "桃子(吨)",
+    prop: "peaches",
+    width: "120"
+  },
+  {
+    label: "柑橘(吨)",
+    prop: "citrus",
+    width: "120"
+  },
+  {
+    label: "梨子(吨)",
+    prop: "pears",
+    width: "120"
+  },
+  {
+    label: "葡萄(吨)",
+    prop: "grapes",
+    width: "120"
+  },
+  {
+    label: "柿子(吨)",
+    prop: "persimmons",
+    width: "120"
+  },
+  {
+    label: "猕猴桃(吨)",
+    prop: "kiwiFruit",
+    width: "120"
+  },
+  {
+    label: "年末果园面积(公顷)",
+    prop: "yearendOrchardArea",
+    width: "120"
+  },
+  {
+    label: "柑橘园面积(公顷)",
+    prop: "citrusArea",
+    width: "120"
+  },
+  {
+    label: "梨园面积(公顷)",
+    prop: "pearsArea",
+    width: "120"
+  },
+  {
+    label: "葡萄园面积(公顷)",
+    prop: "grapesArea",
+    width: "120"
+  },
+  {
+    label: "桃园面积(公顷)",
+    prop: "peachsArea",
+    width: "120"
+  },
+  {
+    label: "猕猴桃面积(公顷)",
+    prop: "kiwiArea",
+    width: "120"
+  },
+  {
+    label: "水产产量(吨)",
+    prop: "aquaticProducts",
+    width: "120"
+  },
+  {
+    label: "淡水捕捞产量(吨)",
+    prop: "fishCaughtAll",
+    width: "120"
+  },
+  {
+    label: "鱼类捕捞(吨)",
+    prop: "fishCaught",
+    width: "120"
+  },
+  {
+    label: "虾蟹类捕捞(吨)",
+    prop: "shrimpsCaught",
+    width: "120"
+  },
+  {
+    label: "贝类捕捞(吨)",
+    prop: "shellfhshCaught",
+    width: "120"
+  },
+  {
+    label: "其他类捕捞(吨)",
+    prop: "otherCaught",
+    width: "120"
+  },
+  {
+    label: "淡水养殖产量(吨)",
+    prop: "fishArtificiallyAll",
+    width: "120"
+  },
+  {
+    label: "鱼类养殖(吨)",
+    prop: "fishArtificially",
+    width: "120"
+  },
+  {
+    label: "贝类养殖(吨)",
+    prop: "shellfhshArtificially",
+    width: "120"
+  },
+  {
+    label: "虾蟹养殖(吨)",
+    prop: "shrimpsArtificially",
+    width: "120"
+  },
+  {
+    label: "其他类养殖(吨)",
+    prop: "otherArtificially",
+    width: "120"
+  },
+  {
+    label: "增值养殖产量(吨)",
+    prop: "fishCulturedAll",
+    width: "120"
+  },
+  {
+    label: "鱼类增殖(吨)",
+    prop: "fishCultured",
+    width: "120"
+  },
+  {
+    label: "贝类增值(吨)",
+    prop: "shellfhshCultured",
+    width: "120"
+  },
+  {
+    label: "其他增值类(吨)",
+    prop: "otherCultured",
+    width: "120"
+  },
+  {
+    label: "淡水养殖面积(公顷)",
+    prop: "freshCulturedArea",
+    width: "120"
+  },
+  {
+    label: "稻田养殖面积(公顷)",
+    prop: "paddyCulturedArea",
+    width: "120"
+  },
+  {
+    label: "增值养殖面积(公顷)",
+    prop: "proliferationArtificiallyArea",
+    width: "120"
   },
 
   {
@@ -114,7 +358,7 @@ const tableRef = ref();
 // 请求数据方法
 async function getData(size = 10, page = 1) {
   loading.value = true;
-  const res = await getProductionValueAndComposition({
+  const res = await getOtherProductionSituation({
     year: year.value,
     limit: size,
     offset: size * (page - 1)
@@ -183,7 +427,7 @@ function handeldeletes() {
 
 // 删除请求
 async function deleteData(years: string[]) {
-  const res = await deleteProductionValueAndComposition({ year: years });
+  const res = await deleteOtherProductionSituation({ year: years });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -223,7 +467,7 @@ const newOpenDrawer = () => {
 
 // 导出
 const exportExcel = async () => {
-  const resData = await getProductionValueAndComposition({ year: [] });
+  const resData = await getOtherProductionSituation({ year: [] });
   if (resData.data) {
     const res = resData.data.map(item => {
       const arr = [];
@@ -244,7 +488,7 @@ const exportExcel = async () => {
     const workSheet = utils.aoa_to_sheet(res);
     const workBook = utils.book_new();
     utils.book_append_sheet(workBook, workSheet);
-    writeFile(workBook, "农林牧渔业分类总产值模板 .xlsx");
+    writeFile(workBook, "牧渔、茶叶和水果生产情况模板 .xlsx");
     ElMessage.success("导出成功");
   }
 };
@@ -266,7 +510,7 @@ const handleMany = async () => {
     return item;
   });
   // console.log(list);
-  const res = await addProductionValueAndComposition({ data: list });
+  const res = await addOtherProductionSituation({ data: list });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -276,10 +520,10 @@ const handleMany = async () => {
 
 <template>
   <div>
-    <grossOutputCompoositionDrawer
+    <productionOfOtherProductsDrawer
       ref="formRef"
       @done="getData"
-    ></grossOutputCompoositionDrawer>
+    ></productionOfOtherProductsDrawer>
     <!-- <formDrawer ref="formRef"></formDrawer> -->
     <!-- <commForm :formOptions="columns" ref="formRef"></commForm> -->
     <!-- <commForm :formOptions="columns" :formData="formData" ref="formRef"></commForm> -->
@@ -321,7 +565,7 @@ const handleMany = async () => {
         <!-- <el-link type="primary" class=" text-sm">下载模板</el-link> -->
         <el-link
           type="primary"
-          href="/xlsxTemplate/农林牧渔业分类总产值模板.xlsx"
+          href="/xlsxTemplate/牧渔、茶叶和水果生产情况模板.xlsx"
           >下载模板</el-link
         >
       </div>

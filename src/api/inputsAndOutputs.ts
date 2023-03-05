@@ -27,7 +27,7 @@ export type AgriculturalProductionRes = {
 
 /*农业相关投入与机械化 */
 export const getProductionConditionsAndInputs = (data: getRequestType) => {
-  return http.request<CategoryOutputValueRes>(
+  return http.request<RroductionConditionsAndInputsDatumRes>(
     "post",
     "/api/agriculturalInputsOutputs/manger/productionConditionsAndInputsByYears",
     {
@@ -37,7 +37,7 @@ export const getProductionConditionsAndInputs = (data: getRequestType) => {
 };
 /*添加农业相关投入与机械化 */
 export const addProductionConditionsAndInputs = (
-  data: addRequestType<AgriculturalProductionDatum>
+  data: addRequestType<RroductionConditionsAndInputsDatum>
 ) => {
   return http.request<messageType>(
     "post",
@@ -49,7 +49,7 @@ export const addProductionConditionsAndInputs = (
 };
 /*修改农业相关投入与机械化 */
 export const updeteProductionConditionsAndInputs = (
-  data: updateRequestType<AgriculturalProductionDatum>
+  data: updateRequestType<RroductionConditionsAndInputsDatum>
 ) => {
   return http.request<messageType>(
     "post",
@@ -61,7 +61,9 @@ export const updeteProductionConditionsAndInputs = (
 };
 
 /*删除农业相关投入与机械化 */
-export const deleteGrassroots = (data: deleteRequestType) => {
+export const deleteProductionConditionsAndInputs = (
+  data: deleteRequestType
+) => {
   return http.request<messageType>(
     "post",
     "/api/agriculturalInputsOutputs/manger/deleteProductionConditionsAndInputs",
@@ -73,7 +75,7 @@ export const deleteGrassroots = (data: deleteRequestType) => {
 
 /*农林牧渔业分类总产值 */
 export const getCategoryOutputValue = (data: getRequestType) => {
-  return http.request<RroductionConditionsAndInputsDatumRes>(
+  return http.request<CategoryOutputValueRes>(
     "post",
     "/api/agriculturalInputsOutputs/manger/categoryOutputValueByYears",
     {
@@ -118,7 +120,7 @@ export const deleteCategoryOutputValue = (data: deleteRequestType) => {
 
 /*主要农产品产量 */
 export const getAgriculturalProduction = (data: getRequestType) => {
-  return http.request<CategoryOutputValueRes>(
+  return http.request<AgriculturalProductionRes>(
     "post",
     "/api/agriculturalInputsOutputs/manger/agriculturalProductionByYears",
     {
@@ -128,7 +130,7 @@ export const getAgriculturalProduction = (data: getRequestType) => {
 };
 /*添加主要农产品产量 */
 export const addAgriculturalProduction = (
-  data: addRequestType<CategoryOutputValueDatum>
+  data: addRequestType<AgriculturalProductionDatum>
 ) => {
   return http.request<messageType>(
     "post",
@@ -140,7 +142,7 @@ export const addAgriculturalProduction = (
 };
 /*修改主要农产品产量 */
 export const updeteAgriculturalProduction = (
-  data: updateRequestType<CategoryOutputValueDatum>
+  data: updateRequestType<AgriculturalProductionDatum>
 ) => {
   return http.request<messageType>(
     "post",

@@ -3,14 +3,14 @@
 import { onMounted, reactive, ref, shallowRef, watch } from "vue";
 import type { PaginationProps, LoadingConfig, Align } from "@pureadmin/table";
 import {
-  getProductionValueAndComposition,
-  deleteProductionValueAndComposition,
-  addProductionValueAndComposition
-} from "@/api/basic";
+  getforestryProduction,
+  deleteForestryProduction,
+  addForestryProduction
+} from "@/api/agriculturalProduction";
 import { isNumber } from "@vueuse/core";
 // import formDrawer from "@/components/form/index.vue";
 // import commForm from "@/components/form/commForm.vue"
-import { grossOutputCompoositionDrawer } from "@/components/drawer";
+import { forestryProductionDrawer } from "@/components/drawer";
 import { utils, writeFile } from "xlsx";
 import { ElMessage, ElMessageBox, UploadProps } from "element-plus";
 import { analysisExcel } from "@/utils/analysisExcel";
@@ -36,28 +36,106 @@ const columns = [
     fixed: true
   },
   {
-    label: "农林牧渔业总计",
-    prop: "total"
+    label: "荒山沙堤造林面积(亩)",
+    prop: "barrenMountain",
+    width: "180"
   },
   {
-    label: "农业",
-    prop: "farming"
+    label: "有林地造林面积(亩)",
+    prop: "forestAfforestation",
+    width: "180"
   },
   {
-    label: "渔业",
-    prop: "fishery"
+    label: "更新改造面积(亩)",
+    prop: "reforestationArea",
+    width: "180"
   },
   {
-    label: "林业",
-    prop: "forestry"
+    label: "四旁零星植树(亩)",
+    prop: "scatteredTreePlanging",
+    width: "180"
   },
   {
-    label: "牧业",
-    prop: "husbandry"
+    label: "森林抚育面积(亩)",
+    prop: "forestTendingArea",
+    width: "180"
   },
   {
-    label: "农林牧渔服务业",
-    prop: "industrialService"
+    label: "当年苗木产量(万株)",
+    prop: "seedlingYield",
+    width: "180"
+  },
+  {
+    label: "育苗面积(亩)",
+    prop: "seedlingArea",
+    width: "180"
+  },
+  {
+    label: "竹木采伐(万立方米)",
+    prop: "bambooTimberHarvesting",
+    width: "180"
+  },
+  {
+    label: "木材(万立方米)",
+    prop: "timber",
+    width: "180"
+  },
+  {
+    label: "竹材(万立方米)",
+    prop: "bamboo",
+    width: "180"
+  },
+  {
+    label: "楠竹(万立方米)",
+    prop: "nanBamboo",
+    width: "180"
+  },
+
+  {
+    label: "杂竹(万立方米)",
+    prop: "sundryBamboo",
+    width: "180"
+  },
+
+  {
+    label: "油桐籽(吨)",
+    prop: "seedsTungOilTree",
+    width: "120"
+  },
+  {
+    label: "油茶籽(吨)",
+    prop: "oilTeaCamelliaSeed",
+    width: "120"
+  },
+  {
+    label: "乌椿籽(吨)",
+    prop: "chineseSapiumSeed",
+    width: "120"
+  },
+  {
+    label: "五倍子(吨)",
+    prop: "chineseGall",
+    width: "120"
+  },
+  {
+    label: "板栗(吨)",
+    prop: "chineseChestnut",
+    width: "120"
+  },
+  {
+    label: "香菇(吨)",
+    prop: "mushroom",
+    width: "120"
+  },
+  {
+    label: "白木耳(吨)",
+    prop: "whiteFungus",
+    width: "120"
+  },
+  {
+    label: "黑木耳(吨)",
+    prop: "blackFungus",
+    width: "120"
   },
 
   {
@@ -114,7 +192,7 @@ const tableRef = ref();
 // 请求数据方法
 async function getData(size = 10, page = 1) {
   loading.value = true;
-  const res = await getProductionValueAndComposition({
+  const res = await getforestryProduction({
     year: year.value,
     limit: size,
     offset: size * (page - 1)
@@ -183,7 +261,7 @@ function handeldeletes() {
 
 // 删除请求
 async function deleteData(years: string[]) {
-  const res = await deleteProductionValueAndComposition({ year: years });
+  const res = await deleteForestryProduction({ year: years });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -223,7 +301,7 @@ const newOpenDrawer = () => {
 
 // 导出
 const exportExcel = async () => {
-  const resData = await getProductionValueAndComposition({ year: [] });
+  const resData = await getforestryProduction({ year: [] });
   if (resData.data) {
     const res = resData.data.map(item => {
       const arr = [];
@@ -244,7 +322,7 @@ const exportExcel = async () => {
     const workSheet = utils.aoa_to_sheet(res);
     const workBook = utils.book_new();
     utils.book_append_sheet(workBook, workSheet);
-    writeFile(workBook, "农林牧渔业分类总产值模板 .xlsx");
+    writeFile(workBook, "林业及林产品生产情况数据报表.xlsx");
     ElMessage.success("导出成功");
   }
 };
@@ -266,7 +344,7 @@ const handleMany = async () => {
     return item;
   });
   // console.log(list);
-  const res = await addProductionValueAndComposition({ data: list });
+  const res = await addForestryProduction({ data: list });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -276,10 +354,10 @@ const handleMany = async () => {
 
 <template>
   <div>
-    <grossOutputCompoositionDrawer
+    <forestryProductionDrawer
       ref="formRef"
       @done="getData"
-    ></grossOutputCompoositionDrawer>
+    ></forestryProductionDrawer>
     <!-- <formDrawer ref="formRef"></formDrawer> -->
     <!-- <commForm :formOptions="columns" ref="formRef"></commForm> -->
     <!-- <commForm :formOptions="columns" :formData="formData" ref="formRef"></commForm> -->
@@ -321,7 +399,7 @@ const handleMany = async () => {
         <!-- <el-link type="primary" class=" text-sm">下载模板</el-link> -->
         <el-link
           type="primary"
-          href="/xlsxTemplate/农林牧渔业分类总产值模板.xlsx"
+          href="/xlsxTemplate/林业及林产品生产情况模板.xlsx"
           >下载模板</el-link
         >
       </div>

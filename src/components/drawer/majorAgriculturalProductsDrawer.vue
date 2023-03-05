@@ -3,20 +3,24 @@ import { reactive, ref, watch } from "vue";
 import { ElMessage, ElMessageBox, FormInstance, FormRules } from "element-plus";
 import commForm from "../form/commForm.vue";
 import {
-  updateProductionValueAndComposition,
-  addProductionValueAndComposition
-} from "@/api/basic";
+  updeteAgriculturalProduction,
+  addAgriculturalProduction
+} from "@/api/inputsAndOutputs";
 import { message } from "@/utils/message";
 import { validate } from "@babel/types";
 
 // 表单数据与验证
 const formData = ref({
-  total: "",
-  farming: "",
-  fishery: "",
-  forestry: "",
-  husbandry: "",
-  industrialService: ""
+  grains: "",
+  cotton: "",
+  oilBearing: "",
+  vagetables: "",
+  fruit: "",
+  slaughteredHogs: "",
+  slaughteredPoultry: "",
+  eggs: "",
+  milk: "",
+  aquaticProducts: ""
 });
 
 const doblueVaildFn = (rule, value, callback) => {
@@ -121,7 +125,7 @@ function confirmClick() {
 
 // 发送修改请求
 async function updeteForm() {
-  const res = await updateProductionValueAndComposition({
+  const res = await updeteAgriculturalProduction({
     data: { ...formData.value },
     year: year.value
   });
@@ -134,7 +138,7 @@ async function updeteForm() {
 
 // 发送新增请求
 async function addForm() {
-  const res = await addProductionValueAndComposition({
+  const res = await addAgriculturalProduction({
     data: [{ ...formData.value, year: year.value }]
   });
   if (res.message) {
@@ -150,7 +154,7 @@ const open = (isEdit: boolean, row, newYear: string) => {
   if (isEdit) {
     edit.value = isEdit;
     year.value = row.year;
-    title.value = `编辑${row.year}年农林牧渔业分类总产值`;
+    title.value = `编辑${row.year}年主要农产品产量`;
     for (let i in formData.value) {
       if (row.hasOwnProperty(i)) formData.value[i] = row[i];
     }
@@ -158,7 +162,7 @@ const open = (isEdit: boolean, row, newYear: string) => {
     edit.value = isEdit;
     console.log(isEdit);
     year.value = newYear;
-    title.value = `编辑${newYear}年农林牧渔业分类总产值`;
+    title.value = `添加${newYear}年主要农产品产量模板`;
   }
   drawer2.value = true;
 };
@@ -192,59 +196,98 @@ const emit = defineEmits(["done"]);
           <div class="grid grid-cols-2 gap-2 w-full">
             <el-form-item
               class="col-span-1"
-              label="农林牧渔业总计"
-              prop="total"
+              label="粮食(吨)"
+              prop="grains"
               :rules="rules.doblueVaild"
             >
-              <!-- {{ rules.intVaild }} -->
-              <el-input v-model="formData.total" placeholder="请输入" />
+              <el-input v-model="formData.grains" placeholder="请输入" />
             </el-form-item>
             <el-form-item
               class="col-span-1"
-              label="农业"
-              prop="farming"
+              label="棉花(吨)"
+              prop="cotton"
               :rules="rules.doblueVaild"
             >
-              <el-input v-model="formData.farming" placeholder="请输入" />
-            </el-form-item>
-          </div>
-          <div class="grid grid-cols-2 gap-2 w-full">
-            <el-form-item
-              class="col-span-1"
-              label="渔业"
-              prop="fishery"
-              :rules="rules.doblueVaild"
-            >
-              <!-- {{ rules.intVaild }} -->
-              <el-input v-model="formData.fishery" placeholder="请输入" />
-            </el-form-item>
-            <el-form-item
-              class="col-span-1"
-              label="林业"
-              prop="forestry"
-              :rules="rules.doblueVaild"
-            >
-              <el-input v-model="formData.forestry" placeholder="请输入" />
+              <el-input v-model="formData.cotton" placeholder="请输入" />
             </el-form-item>
           </div>
           <div class="grid grid-cols-2 gap-2 w-full">
             <el-form-item
               class="col-span-1"
-              label="牧业"
-              prop="husbandry"
+              label="油料(吨)"
+              prop="oilBearing"
               :rules="rules.doblueVaild"
             >
-              <!-- {{ rules.intVaild }} -->
-              <el-input v-model="formData.husbandry" placeholder="请输入" />
+              <el-input v-model="formData.oilBearing" placeholder="请输入" />
             </el-form-item>
             <el-form-item
               class="col-span-1"
-              label="农林牧渔服务业"
-              prop="industrialService"
+              label="蔬菜(吨)"
+              prop="vagetables"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.vagetables" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="水果(吨)"
+              prop="fruit"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.fruit" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="生猪出栏(万头)"
+              prop="slaughteredHogs"
               :rules="rules.doblueVaild"
             >
               <el-input
-                v-model="formData.industrialService"
+                v-model="formData.slaughteredHogs"
+                placeholder="请输入"
+              />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="家禽出笼(万只)"
+              prop="slaughteredPoultry"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.slaughteredPoultry"
+                placeholder="请输入"
+              />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="禽蛋产量(吨)"
+              prop="eggs"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.eggs" placeholder="请输入" />
+            </el-form-item>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <el-form-item
+              class="col-span-1"
+              label="牛奶(吨)"
+              prop="milk"
+              :rules="rules.doblueVaild"
+            >
+              <el-input v-model="formData.milk" placeholder="请输入" />
+            </el-form-item>
+            <el-form-item
+              class="col-span-1"
+              label="水产品(吨)"
+              prop="aquaticProducts"
+              :rules="rules.doblueVaild"
+            >
+              <el-input
+                v-model="formData.aquaticProducts"
                 placeholder="请输入"
               />
             </el-form-item>

@@ -3,14 +3,14 @@
 import { onMounted, reactive, ref, shallowRef, watch } from "vue";
 import type { PaginationProps, LoadingConfig, Align } from "@pureadmin/table";
 import {
-  getProductionValueAndComposition,
-  deleteProductionValueAndComposition,
-  addProductionValueAndComposition
-} from "@/api/basic";
+  getCropProduction,
+  deleteCropProduction,
+  addCropProduction
+} from "@/api/agriculturalProduction";
 import { isNumber } from "@vueuse/core";
 // import formDrawer from "@/components/form/index.vue";
 // import commForm from "@/components/form/commForm.vue"
-import { grossOutputCompoositionDrawer } from "@/components/drawer";
+import { sownOutputPerHectareProductionDrawer } from "@/components/drawer";
 import { utils, writeFile } from "xlsx";
 import { ElMessage, ElMessageBox, UploadProps } from "element-plus";
 import { analysisExcel } from "@/utils/analysisExcel";
@@ -23,6 +23,29 @@ onMounted(async () => {
   getData();
 });
 
+const CLASSIFY = {
+  sown: "播种面积(公顷)",
+  output: "总产量(吨)",
+  perHectare: "单位面积产量(公斤/公顷)"
+};
+
+const classifyValue = ref("");
+
+const classifyOptions = [
+  {
+    value: "sown",
+    label: "播种面积(公顷)"
+  },
+  {
+    value: "output",
+    label: "总产量(吨)"
+  },
+  {
+    value: "perHectare",
+    label: "单位面积产量(公斤/公顷)"
+  }
+];
+
 const columns = [
   {
     label: "选择",
@@ -31,35 +54,126 @@ const columns = [
     align: "left"
   },
   {
+    label: "分类",
+    prop: "classify",
+    slot: "classify",
+    fixed: true,
+    width: "180"
+  },
+  {
     label: "年份",
     prop: "year",
     fixed: true
   },
   {
-    label: "农林牧渔业总计",
-    prop: "total"
+    label: "粮食作物",
+    prop: "grainCrops"
   },
   {
-    label: "农业",
-    prop: "farming"
+    label: "夏收粮食",
+    prop: "summerGrainCrops"
   },
   {
-    label: "渔业",
-    prop: "fishery"
+    label: "小麦",
+    prop: "wheat"
   },
   {
-    label: "林业",
-    prop: "forestry"
+    label: "豆类",
+    prop: "soybeanSummer"
   },
   {
-    label: "牧业",
-    prop: "husbandry"
+    label: "薯类",
+    prop: "tuberCropsSummer"
   },
   {
-    label: "农林牧渔服务业",
-    prop: "industrialService"
+    label: "其他小谷物-夏",
+    prop: "otherCerealsSummer"
+  },
+  {
+    label: "早稻",
+    prop: "earlySeasonRice"
+  },
+  {
+    label: "秋收粮食",
+    prop: "autumnGrainCrops"
+  },
+  {
+    label: "稻谷",
+    prop: "paddyRice"
+  },
+  {
+    label: "中稻",
+    prop: "midSeasonRice"
+  },
+  {
+    label: "双季晚稻",
+    prop: "doubleRotationRice"
+  },
+  {
+    label: "玉米",
+    prop: "corn"
+  },
+  {
+    label: "豆类",
+    prop: "soybeanAutumn"
+  },
+  {
+    label: "薯类",
+    prop: "tuberCropsAutumn"
+  },
+  {
+    label: "其他小谷物-秋",
+    prop: "otherCerealsAutumn"
+  },
+  {
+    label: "棉花",
+    prop: "cotton"
   },
 
+  {
+    label: "油料",
+    prop: "oilBerain"
+  },
+  {
+    label: "油菜籽",
+    prop: "rapeSeeds"
+  },
+  {
+    label: "花生",
+    prop: "peanuts"
+  },
+  {
+    label: "芝麻",
+    prop: "sesame"
+  },
+  {
+    label: "麻类",
+    prop: "fiberCrops"
+  },
+  {
+    label: "糖料",
+    prop: "sugarCrops"
+  },
+  {
+    label: "烟草",
+    prop: "tobacco"
+  },
+  {
+    label: "药材",
+    prop: "herbCrops"
+  },
+  {
+    label: "蔬菜与瓜果",
+    prop: "vagetableMelons"
+  },
+  {
+    label: "蔬菜",
+    prop: "vagetable"
+  },
+  {
+    label: "瓜果",
+    prop: "melons"
+  },
   {
     label: "操作",
     prop: "operate",
@@ -73,8 +187,11 @@ const columns = [
 const yearValue = ref("");
 const year = ref<string[]>([]);
 function searchInfo() {
-  year.value = [];
-  year.value.push(yearValue.value);
+  if (yearValue.value == "") {
+    year.value = [];
+  } else {
+    year.value.push(yearValue.value);
+  }
   console.log(year.value);
   getData();
 }
@@ -82,6 +199,7 @@ function searchInfo() {
 function resetInfo() {
   year.value = [];
   yearValue.value = "";
+  classifyValue.value = "";
   getData();
 }
 
@@ -114,8 +232,9 @@ const tableRef = ref();
 // 请求数据方法
 async function getData(size = 10, page = 1) {
   loading.value = true;
-  const res = await getProductionValueAndComposition({
+  const res = await getCropProduction({
     year: year.value,
+    classify: classifyValue.value,
     limit: size,
     offset: size * (page - 1)
   });
@@ -138,7 +257,7 @@ const formRef = ref<any>();
 function handleEdit(row) {
   console.log(row);
   console.log(formRef.value);
-  formRef.value.open(true, row, "");
+  formRef.value.open(true, row);
 }
 
 // 多选事件
@@ -183,7 +302,7 @@ function handeldeletes() {
 
 // 删除请求
 async function deleteData(years: string[]) {
-  const res = await deleteProductionValueAndComposition({ year: years });
+  const res = await deleteCropProduction({ year: years });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -193,12 +312,14 @@ async function deleteData(years: string[]) {
 // 新增数据的年份
 const dialogVisible = ref(false);
 const addYearValue = ref("");
+const addClassifyValue = ref("");
 
 watch(
   dialogVisible,
   (newQuestion, oldQuestion) => {
     if (!newQuestion) {
       addYearValue.value = "";
+      addClassifyValue.value = "";
     }
   },
   {}
@@ -218,12 +339,13 @@ const handleClose = (done: () => void) => {
 // 选择年份后打开抽屉
 const newOpenDrawer = () => {
   dialogVisible.value = false;
-  formRef.value.open(false, {}, addYearValue.value);
+  console.log(addYearValue.value);
+  formRef.value.open(false, {}, addYearValue.value, addClassifyValue.value);
 };
 
 // 导出
 const exportExcel = async () => {
-  const resData = await getProductionValueAndComposition({ year: [] });
+  const resData = await getCropProduction({ year: [] });
   if (resData.data) {
     const res = resData.data.map(item => {
       const arr = [];
@@ -244,18 +366,38 @@ const exportExcel = async () => {
     const workSheet = utils.aoa_to_sheet(res);
     const workBook = utils.book_new();
     utils.book_append_sheet(workBook, workSheet);
-    writeFile(workBook, "农林牧渔业分类总产值模板 .xlsx");
+    writeFile(workBook, "农作物生产情况模板.xlsx");
     ElMessage.success("导出成功");
   }
 };
 
+const classifyDialogVisible = ref(false);
+
+watch(
+  classifyDialogVisible,
+  (newQuestion, oldQuestion) => {
+    if (!newQuestion) {
+      importClassifyValue.value = "";
+    }
+  },
+  {}
+);
+
 // 导入
+
+const newImport = () => {
+  classifyDialogVisible.value = true;
+};
 const importList = shallowRef<any>([]);
+const importClassifyValue = ref("");
 const beforeUpload: UploadProps["beforeUpload"] = async rawFile => {
   importList.value = await analysisExcel(rawFile, columns, [
     "operate",
     "selection"
   ]);
+  importList.value.forEach(item => {
+    item.classify = importClassifyValue.value;
+  });
   console.log(importList.value);
   return true;
 };
@@ -266,9 +408,10 @@ const handleMany = async () => {
     return item;
   });
   // console.log(list);
-  const res = await addProductionValueAndComposition({ data: list });
+  const res = await addCropProduction({ data: list });
   if (res.message) {
     ElMessage.success(res.message);
+    classifyDialogVisible.value = false;
     getData();
   }
 };
@@ -276,28 +419,47 @@ const handleMany = async () => {
 
 <template>
   <div>
-    <grossOutputCompoositionDrawer
+    <sownOutputPerHectareProductionDrawer
       ref="formRef"
       @done="getData"
-    ></grossOutputCompoositionDrawer>
+    ></sownOutputPerHectareProductionDrawer>
     <!-- <formDrawer ref="formRef"></formDrawer> -->
     <!-- <commForm :formOptions="columns" ref="formRef"></commForm> -->
     <!-- <commForm :formOptions="columns" :formData="formData" ref="formRef"></commForm> -->
     <el-card>
       <template #header>
         <div class="card-header flex">
-          <el-date-picker
-            v-model="yearValue"
-            type="year"
-            placeholder="请选择年份"
-            format="YYYY"
-            value-format="YYYY"
-          />
+          <div class="ml-2 flex">
+            <p class="text-center self-center">年份：</p>
+            <el-date-picker
+              v-model="yearValue"
+              type="year"
+              placeholder="请选择年份"
+              format="YYYY"
+              value-format="YYYY"
+            />
+          </div>
+          <div class="ml-2 flex">
+            <p class="text-center self-center">选择类型：</p>
+
+            <el-select
+              class="ml-2"
+              v-model="classifyValue"
+              placeholder="请选择类型"
+            >
+              <el-option
+                v-for="item in classifyOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </div>
           <div class="flex pl-2">
-            <el-button class="button" type="info" @click="resetInfo"
+            <el-button class="button" type="info" @click.stop="resetInfo"
               >重置</el-button
             >
-            <el-button class="button" type="primary" @click="searchInfo"
+            <el-button class="button" type="primary" @click.stop="searchInfo"
               >查询</el-button
             >
           </div>
@@ -307,7 +469,7 @@ const handleMany = async () => {
         <el-button class="button" type="primary" @click="handleAdd">
           新增
         </el-button>
-        <el-upload
+        <!-- <el-upload
           class="mx-2"
           action="https://jsonplaceholder.typicode.com/posts/"
           :limit="1"
@@ -316,12 +478,12 @@ const handleMany = async () => {
           :before-upload="beforeUpload"
           :http-request="handleMany"
         >
-          <el-button class="button" type="primary"> 导入 </el-button>
-        </el-upload>
+          <el-button class="button" type="primary"> 导入 </el-button> -->
+        <!-- </el-upload> -->
+        <el-button type="primary" @click="newImport"> 导入 </el-button>
+
         <!-- <el-link type="primary" class=" text-sm">下载模板</el-link> -->
-        <el-link
-          type="primary"
-          href="/xlsxTemplate/农林牧渔业分类总产值模板.xlsx"
+        <el-link type="primary" href="/xlsxTemplate/农作物生产情况模板.xlsx"
           >下载模板</el-link
         >
       </div>
@@ -337,6 +499,7 @@ const handleMany = async () => {
         @current-change="onCurrentChange1"
         @size-change="onSizeChange"
       >
+        <template #classify="scope"> </template>
         <template #operate="scope">
           <el-button
             type="primary"
@@ -363,17 +526,37 @@ const handleMany = async () => {
     <!-- 新增数据的年份确认弹框 -->
     <el-dialog
       v-model="dialogVisible"
-      title="请选择年份"
-      width="20%"
+      title="请选择年份与类型"
+      width="35%"
       :before-close="handleClose"
     >
-      <el-date-picker
-        v-model="addYearValue"
-        type="year"
-        placeholder="请选择年份"
-        format="YYYY"
-        value-format="YYYY"
-      />
+      <div class="flex">
+        <div>
+          <p class="text-left pb-2">选择年份：</p>
+          <el-date-picker
+            v-model="addYearValue"
+            type="year"
+            placeholder="请选择年份"
+            format="YYYY"
+            value-format="YYYY"
+          />
+        </div>
+        <div class="pl-3">
+          <p class="text-left pl-2 pb-2">选择类型：</p>
+          <el-select
+            class="ml-2"
+            v-model="addClassifyValue"
+            placeholder="请选择类型"
+          >
+            <el-option
+              v-for="item in classifyOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </div>
+      </div>
       <template #footer>
         <span class="dialog-footer">
           <el-button
@@ -385,6 +568,60 @@ const handleMany = async () => {
             >取消</el-button
           >
           <el-button type="primary" @click="newOpenDrawer"> 确认 </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 导入类型选择 -->
+    <el-dialog
+      v-model="classifyDialogVisible"
+      title="请选择导入类型"
+      width="20%"
+      :before-close="handleClose"
+    >
+      <p class="text-left pl-2 pb-2">选择类型：</p>
+      <el-select
+        class="ml-2"
+        v-model="importClassifyValue"
+        placeholder="请选择类型"
+      >
+        <el-option
+          v-for="item in classifyOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+      <template #footer>
+        <span class="dialog-footer flex justify-center">
+          {{ importClassifyValue }}
+          <el-button
+            @click="
+              () => {
+                handleClose(() => {});
+              }
+            "
+            >取消</el-button
+          >
+
+          <el-upload
+            class="mx-2"
+            action="https://jsonplaceholder.typicode.com/posts/"
+            :limit="1"
+            accept=".xlsx, .xls"
+            :show-file-list="false"
+            :before-upload="beforeUpload"
+            :http-request="handleMany"
+            :disabled="importClassifyValue == ''"
+          >
+            <el-button
+              class="button"
+              type="primary"
+              :disabled="importClassifyValue == ''"
+            >
+              导入
+            </el-button>
+          </el-upload>
         </span>
       </template>
     </el-dialog>

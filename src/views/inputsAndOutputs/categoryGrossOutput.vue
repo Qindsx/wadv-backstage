@@ -3,14 +3,14 @@
 import { onMounted, reactive, ref, shallowRef, watch } from "vue";
 import type { PaginationProps, LoadingConfig, Align } from "@pureadmin/table";
 import {
-  getProductionValueAndComposition,
-  deleteProductionValueAndComposition,
-  addProductionValueAndComposition
-} from "@/api/basic";
+  getCategoryOutputValue,
+  deleteCategoryOutputValue,
+  addCategoryOutputValue
+} from "@/api/inputsAndOutputs";
 import { isNumber } from "@vueuse/core";
 // import formDrawer from "@/components/form/index.vue";
 // import commForm from "@/components/form/commForm.vue"
-import { grossOutputCompoositionDrawer } from "@/components/drawer";
+import { categoryGrossOutputDrawer } from "@/components/drawer";
 import { utils, writeFile } from "xlsx";
 import { ElMessage, ElMessageBox, UploadProps } from "element-plus";
 import { analysisExcel } from "@/utils/analysisExcel";
@@ -36,30 +36,84 @@ const columns = [
     fixed: true
   },
   {
-    label: "农林牧渔业总计",
-    prop: "total"
-  },
-  {
-    label: "农业",
+    label: "农业产值",
     prop: "farming"
   },
   {
-    label: "渔业",
-    prop: "fishery"
+    label: "谷物",
+    prop: "cereal"
   },
   {
-    label: "林业",
+    label: "豆类",
+    prop: "beans"
+  },
+  {
+    label: "棉花",
+    prop: "cotton"
+  },
+  {
+    label: "油料",
+    prop: "oilCrops"
+  },
+  {
+    label: "麻类",
+    prop: "fiberCrops"
+  },
+  {
+    label: "糖料",
+    prop: "sugarCrops"
+  },
+  {
+    label: "烟草",
+    prop: "tobacco"
+  },
+  {
+    label: "药材",
+    prop: "herbCrops"
+  },
+  {
+    label: "薯类",
+    prop: "tuberCrops"
+  },
+  {
+    label: "蔬菜和菌子",
+    prop: "vagetable",
+    width: "120"
+  },
+  {
+    label: "茶桑果",
+    prop: "teaFruit"
+  },
+  {
+    label: "花卉园艺",
+    prop: "flower"
+  },
+  {
+    label: "其他作物",
+    prop: "otherCrops"
+  },
+  {
+    label: "采集野生植物",
+    prop: "wildPlants",
+    width: "120"
+  },
+  {
+    label: "林业产值",
     prop: "forestry"
   },
   {
-    label: "牧业",
-    prop: "husbandry"
+    label: "牧业产值",
+    prop: "animalHusbandry"
   },
   {
-    label: "农林牧渔服务业",
-    prop: "industrialService"
+    label: "渔业产值",
+    prop: "fishery"
   },
-
+  {
+    label: "服务业产值",
+    prop: "industrialService",
+    width: "120"
+  },
   {
     label: "操作",
     prop: "operate",
@@ -114,7 +168,7 @@ const tableRef = ref();
 // 请求数据方法
 async function getData(size = 10, page = 1) {
   loading.value = true;
-  const res = await getProductionValueAndComposition({
+  const res = await getCategoryOutputValue({
     year: year.value,
     limit: size,
     offset: size * (page - 1)
@@ -183,7 +237,7 @@ function handeldeletes() {
 
 // 删除请求
 async function deleteData(years: string[]) {
-  const res = await deleteProductionValueAndComposition({ year: years });
+  const res = await deleteCategoryOutputValue({ year: years });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -223,7 +277,7 @@ const newOpenDrawer = () => {
 
 // 导出
 const exportExcel = async () => {
-  const resData = await getProductionValueAndComposition({ year: [] });
+  const resData = await getCategoryOutputValue({ year: [] });
   if (resData.data) {
     const res = resData.data.map(item => {
       const arr = [];
@@ -244,7 +298,7 @@ const exportExcel = async () => {
     const workSheet = utils.aoa_to_sheet(res);
     const workBook = utils.book_new();
     utils.book_append_sheet(workBook, workSheet);
-    writeFile(workBook, "农林牧渔业分类总产值模板 .xlsx");
+    writeFile(workBook, "农林牧渔业分类总产值数据报表.xlsx");
     ElMessage.success("导出成功");
   }
 };
@@ -266,7 +320,7 @@ const handleMany = async () => {
     return item;
   });
   // console.log(list);
-  const res = await addProductionValueAndComposition({ data: list });
+  const res = await addCategoryOutputValue({ data: list });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -276,10 +330,10 @@ const handleMany = async () => {
 
 <template>
   <div>
-    <grossOutputCompoositionDrawer
+    <categoryGrossOutputDrawer
       ref="formRef"
       @done="getData"
-    ></grossOutputCompoositionDrawer>
+    ></categoryGrossOutputDrawer>
     <!-- <formDrawer ref="formRef"></formDrawer> -->
     <!-- <commForm :formOptions="columns" ref="formRef"></commForm> -->
     <!-- <commForm :formOptions="columns" :formData="formData" ref="formRef"></commForm> -->

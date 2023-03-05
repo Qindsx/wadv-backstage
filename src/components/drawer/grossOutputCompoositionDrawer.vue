@@ -150,7 +150,7 @@ const open = (isEdit: boolean, row, newYear: string) => {
   if (isEdit) {
     edit.value = isEdit;
     year.value = row.year;
-    title.value = `编辑${row.year}年农林牧渔业分类总产值`;
+    title.value = `编辑${row.year}年农林牧渔业总产值`;
     for (let i in formData.value) {
       if (row.hasOwnProperty(i)) formData.value[i] = row[i];
     }
@@ -158,7 +158,7 @@ const open = (isEdit: boolean, row, newYear: string) => {
     edit.value = isEdit;
     console.log(isEdit);
     year.value = newYear;
-    title.value = `编辑${newYear}年农林牧渔业分类总产值`;
+    title.value = `添加${newYear}年农林牧渔业总产值`;
   }
   drawer2.value = true;
 };

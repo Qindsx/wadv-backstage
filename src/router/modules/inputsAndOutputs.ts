@@ -1,13 +1,13 @@
 // 最简代码，也就是这些字段必须有
 export default {
-  path: "/agriculturalProductionMechanization",
+  path: "/inputsAndOutputs/agriculturalProductionMechanization",
   meta: {
     title: "农业生产投入与产出",
     icon: "clarity:clipboard-solid"
   },
   children: [
     {
-      path: "/agriculturalProductionMechanization",
+      path: "/inputsAndOutputs/agriculturalProductionMechanization",
       name: "agriculturalProductionMechanization",
       component: () =>
         import(
@@ -18,21 +18,21 @@ export default {
       }
     },
     {
-      path: "/agriculturalProductionMechanization/categoryGrossOutput",
+      path: "/inputsAndOutputs/categoryGrossOutput",
       name: "categoryGrossOutput",
       component: () =>
         import("@/views/inputsAndOutputs/categoryGrossOutput.vue"),
       meta: {
-        title: "农林牧渔总产值及指数"
+        title: "农林渔牧业分类总产值"
       }
     },
     {
-      path: "/agriculturalProductionMechanization/majorAgriculturalProducts",
+      path: "/inputsAndOutputs/majorAgriculturalProducts",
       name: "majorAgriculturalProducts",
       component: () =>
         import("@/views/inputsAndOutputs/majorAgriculturalProducts.vue"),
       meta: {
-        title: "农林牧渔分类总产值"
+        title: "主要农产品产量"
       }
     }
   ]

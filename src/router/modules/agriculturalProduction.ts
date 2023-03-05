@@ -28,7 +28,7 @@ export default {
     },
     {
       path: "/agriculturalProduction/productionOfOtherProducts",
-      name: "grossOutputCompoosition",
+      name: "productionOfOtherProducts",
       component: () =>
         import("@/views/agriculturalProduction/productionOfOtherProducts.vue"),
       meta: {

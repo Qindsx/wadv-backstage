@@ -3,14 +3,14 @@
 import { onMounted, reactive, ref, shallowRef, watch } from "vue";
 import type { PaginationProps, LoadingConfig, Align } from "@pureadmin/table";
 import {
-  getProductionValueAndComposition,
-  deleteProductionValueAndComposition,
-  addProductionValueAndComposition
-} from "@/api/basic";
+  getProductionConditionsAndInputs,
+  deleteProductionConditionsAndInputs,
+  addProductionConditionsAndInputs
+} from "@/api/inputsAndOutputs";
 import { isNumber } from "@vueuse/core";
 // import formDrawer from "@/components/form/index.vue";
 // import commForm from "@/components/form/commForm.vue"
-import { grossOutputCompoositionDrawer } from "@/components/drawer";
+import { agriculturalProductionMechanizationDrawer } from "@/components/drawer";
 import { utils, writeFile } from "xlsx";
 import { ElMessage, ElMessageBox, UploadProps } from "element-plus";
 import { analysisExcel } from "@/utils/analysisExcel";
@@ -36,28 +36,124 @@ const columns = [
     fixed: true
   },
   {
-    label: "农林牧渔业总计",
-    prop: "total"
+    label: "有效灌溉面积(千公顷)",
+    prop: "effectiveIrrigationArea",
+    width: "220"
   },
   {
-    label: "农业",
-    prop: "farming"
+    label: "旱涝保收面积(千公顷)",
+    prop: "floodDroughtArea",
+    width: "220"
   },
   {
-    label: "渔业",
-    prop: "fishery"
+    label: "机电排灌面积(千公顷)",
+    prop: "pumpedIrrigationArea",
+    width: "220"
   },
   {
-    label: "林业",
-    prop: "forestry"
+    label: "农村用电量(万千瓦小时)",
+    prop: "electricityRuralArea",
+    width: "220"
   },
   {
-    label: "牧业",
-    prop: "husbandry"
+    label: "农用化肥施用量-氮肥(吨)",
+    prop: "nitrogenousFertilizer",
+    width: "220"
   },
   {
-    label: "农林牧渔服务业",
-    prop: "industrialService"
+    label: "农用化肥施用量-磷肥(吨)",
+    prop: "phosphateFertilizer",
+    width: "220"
+  },
+  {
+    label: "农用化肥施用量-钾肥(吨)",
+    prop: "potashFertilizer",
+    width: "220"
+  },
+  {
+    label: "农用化肥施用量-复合肥(吨)",
+    prop: "compoundFertilizer",
+    width: "220"
+  },
+  {
+    label: "农用塑料薄膜使用量-地膜(吨)",
+    prop: "mulchFilm",
+    width: "220"
+  },
+  {
+    label: "农用塑料薄膜使用量-地膜覆盖面积(千公顷)",
+    prop: "mulchFilmArea",
+    width: "320"
+  },
+  {
+    label: "农用柴油(吨)",
+    prop: "agriculturalDieselOil",
+    width: "220"
+  },
+  {
+    label: "农药使用量(吨)",
+    prop: "comsumptionPesticide",
+    width: "220"
+  },
+  {
+    label: "柴油发动机动力(万千瓦)",
+    prop: "dieselEngines",
+    width: "220"
+  },
+  {
+    label: "汽油发动机动力(万千瓦)",
+    prop: "gasolineEngines",
+    width: "220"
+  },
+  {
+    label: "大中型拖拉机(台)",
+    prop: "largeTractors",
+    width: "220"
+  },
+  {
+    label: "大中型拖拉机-动力(万千瓦)",
+    prop: "largePower",
+    width: "220"
+  },
+  {
+    label: "小型及扶手拖拉机(台)",
+    prop: "miniTractors",
+    width: "220"
+  },
+  {
+    label: "小型及扶手拖拉机-动力(万千瓦)",
+    prop: "miniPowers",
+    width: "220"
+  },
+  {
+    label: "大中型拖拉机配套农具(部)",
+    prop: "largeMachinery",
+    width: "220"
+  },
+  {
+    label: "小型拖拉机配套农具(部)",
+    prop: "miniMachinery",
+    width: "220"
+  },
+  {
+    label: "农用水泵(台)",
+    prop: "pumps",
+    width: "140"
+  },
+  {
+    label: "联合收割机(台)",
+    prop: "combine",
+    width: "140"
+  },
+  {
+    label: "联合收割机-动力(千瓦)",
+    prop: "combinePower",
+    width: "220"
+  },
+  {
+    label: "机动脱粒机(台)",
+    prop: "motorizedThresher",
+    width: "220"
   },
 
   {
@@ -114,7 +210,7 @@ const tableRef = ref();
 // 请求数据方法
 async function getData(size = 10, page = 1) {
   loading.value = true;
-  const res = await getProductionValueAndComposition({
+  const res = await getProductionConditionsAndInputs({
     year: year.value,
     limit: size,
     offset: size * (page - 1)
@@ -183,7 +279,7 @@ function handeldeletes() {
 
 // 删除请求
 async function deleteData(years: string[]) {
-  const res = await deleteProductionValueAndComposition({ year: years });
+  const res = await deleteProductionConditionsAndInputs({ year: years });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -223,7 +319,7 @@ const newOpenDrawer = () => {
 
 // 导出
 const exportExcel = async () => {
-  const resData = await getProductionValueAndComposition({ year: [] });
+  const resData = await getProductionConditionsAndInputs({ year: [] });
   if (resData.data) {
     const res = resData.data.map(item => {
       const arr = [];
@@ -244,7 +340,7 @@ const exportExcel = async () => {
     const workSheet = utils.aoa_to_sheet(res);
     const workBook = utils.book_new();
     utils.book_append_sheet(workBook, workSheet);
-    writeFile(workBook, "农林牧渔业分类总产值模板 .xlsx");
+    writeFile(workBook, "农业生产投入情况数据报表.xlsx");
     ElMessage.success("导出成功");
   }
 };
@@ -266,7 +362,7 @@ const handleMany = async () => {
     return item;
   });
   // console.log(list);
-  const res = await addProductionValueAndComposition({ data: list });
+  const res = await addProductionConditionsAndInputs({ data: list });
   if (res.message) {
     ElMessage.success(res.message);
     getData();
@@ -276,10 +372,10 @@ const handleMany = async () => {
 
 <template>
   <div>
-    <grossOutputCompoositionDrawer
+    <agriculturalProductionMechanizationDrawer
       ref="formRef"
       @done="getData"
-    ></grossOutputCompoositionDrawer>
+    ></agriculturalProductionMechanizationDrawer>
     <!-- <formDrawer ref="formRef"></formDrawer> -->
     <!-- <commForm :formOptions="columns" ref="formRef"></commForm> -->
     <!-- <commForm :formOptions="columns" :formData="formData" ref="formRef"></commForm> -->
@@ -319,9 +415,7 @@ const handleMany = async () => {
           <el-button class="button" type="primary"> 导入 </el-button>
         </el-upload>
         <!-- <el-link type="primary" class=" text-sm">下载模板</el-link> -->
-        <el-link
-          type="primary"
-          href="/xlsxTemplate/农林牧渔业分类总产值模板.xlsx"
+        <el-link type="primary" href="/xlsxTemplate/农业生产投入情况模板.xlsx"
           >下载模板</el-link
         >
       </div>

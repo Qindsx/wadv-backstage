@@ -157,7 +157,7 @@ const open = (isEdit: boolean, row, newYear: string) => {
     edit.value = isEdit;
     console.log(isEdit);
     year.value = newYear;
-    title.value = `编辑${newYear}年农村基层组织﹑户数、人口、从业人员`;
+    title.value = `添加${newYear}年农村基层组织﹑户数、人口、从业人员`;
   }
   drawer2.value = true;
 };
