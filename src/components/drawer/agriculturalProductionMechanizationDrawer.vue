@@ -101,9 +101,8 @@ function beforeClose() {
 
 watch(
   drawer2,
-  (newQuestion, oldQuestion) => {
-    if (!newQuestion) {
-      console.log("close");
+  (newValue, olaValue) => {
+    if (!newValue) {
       formData.value = {
         effectiveIrrigationArea: "",
         floodDroughtArea: "",
@@ -130,7 +129,6 @@ watch(
         combinePower: "",
         motorizedThresher: ""
       };
-      // formRefD.value.resetFields();
     }
   },
   {}
